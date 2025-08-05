@@ -1,8 +1,8 @@
-use super::errors::{MeshError, Result};
+use super::errors::Result;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use vodozemac::olm::Account;
+use vodozemac::olm::{Account, AccountPickle};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Device {
@@ -15,7 +15,7 @@ pub struct Device {
 impl Device {
     pub fn new(name: String) -> Result<Self> {
         let account = Account::new();
-        let pickled_account = account.pickle().map_err(MeshError::Cryptography)?;
+        let pickled_account = serde_json::to_string(&account.pickle())?;
         Ok(Self {
             id: Uuid::new_v4(),
             name,
@@ -25,6 +25,7 @@ impl Device {
     }
 
     pub fn account(&self) -> Result<Account> {
-        Account::from_pickle(&self.pickled_account).map_err(MeshError::Cryptography)
+        let pickle: AccountPickle = serde_json::from_str(&self.pickled_account)?;
+        Ok(pickle.into())
     }
 }

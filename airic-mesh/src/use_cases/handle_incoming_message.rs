@@ -38,10 +38,10 @@ impl HandleIncomingMessage {
                 let mut olm_session = session.olm_session()?;
                 let decrypted = olm_session.decrypt(&message.ciphertext)?;
 
-                session.pickled_session = olm_session.pickle()?;
+                session.pickled_session = serde_json::to_string(&olm_session.pickle())?;
                 self.mesh_repo.save_session(&session).await?;
 
-                let app_message: ApplicationMessage = serde_json::from_str(&decrypted)?;
+                let app_message: ApplicationMessage = serde_json::from_slice(&decrypted)?;
                 Ok(app_message)
             }
             Err(MeshError::SessionNotFound(_, _)) => {
@@ -49,11 +49,13 @@ impl HandleIncomingMessage {
                 let local_device = self.mesh_repo.load_device(self.local_device_id).await?;
                 let local_account = local_device.account()?;
 
-                let (mut session, plaintext) = Session::new_inbound(
+                // Convert OlmMessage to string format for the session creation
+                let ciphertext_str = serde_json::to_string(&message.ciphertext)?;
+                let (session, plaintext) = Session::new_inbound(
                     self.local_device_id,
                     sender_id,
                     &local_account,
-                    &message.ciphertext,
+                    &ciphertext_str,
                 )?;
 
                 self.mesh_repo.save_session(&session).await?;

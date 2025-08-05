@@ -5,7 +5,9 @@ pub enum MeshError {
     #[error("Failed to (de)serialize entity: {0}")]
     Serialization(#[from] serde_json::Error),
     #[error("Cryptography error from vodozemac: {0}")]
-    Cryptography(#[from] vodozemac::CryptoError),
+    Cryptography(#[from] vodozemac::olm::DecryptionError),
+    #[error("Decode error from vodozemac: {0}")]
+    Decode(#[from] vodozemac::DecodeError),
     #[error("Device with id {0} not found")]
     DeviceNotFound(String),
     #[error("Session for devices {0} and {1} not found")]

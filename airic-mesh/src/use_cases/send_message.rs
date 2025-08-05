@@ -45,7 +45,7 @@ impl SendMessage {
         let plaintext = serde_json::to_string(&message)?;
         let encrypted = olm_session.encrypt(&plaintext);
 
-        session.pickled_session = olm_session.pickle()?;
+        session.pickled_session = serde_json::to_string(&olm_session.pickle())?;
         self.mesh_repo.save_session(&session).await?;
 
         let wire_message = WireMessage {

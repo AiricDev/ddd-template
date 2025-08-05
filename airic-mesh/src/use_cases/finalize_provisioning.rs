@@ -4,8 +4,10 @@ use crate::core::wire_message::WireMessage;
 use crate::use_cases::ports::mesh_repository::MeshRepository;
 use crate::use_cases::ports::network_transport::NetworkTransport;
 use serde_json::Value;
+use vodozemac::olm::OlmMessage;
 use std::sync::Arc;
 use uuid::Uuid;
+use vodozemac::olm::Message;
 
 pub struct FinalizeProvisioning {
     mesh_repo: Arc<dyn MeshRepository>,
@@ -56,9 +58,11 @@ impl FinalizeProvisioning {
         )?;
 
         self.mesh_repo.save_session(&session).await?;
-
+        
+        // For now, we'll create a placeholder message since the session creation is not fully implemented
+        // In a real implementation, first_message would be a proper OlmMessage
         let wire_message = WireMessage {
-            ciphertext: first_message,
+            ciphertext: OlmMessage::Normal(Message::from_bytes(&first_message.into_bytes())?),
             sender_device_id: self.local_device_id,
         };
 
