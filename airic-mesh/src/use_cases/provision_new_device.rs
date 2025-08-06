@@ -18,7 +18,11 @@ impl ProvisionNewDevice {
 
         self.mesh_repo.save_device(&device).await?;
 
-        let account = device.account()?;
+        let mut account = device.account()?;
+        
+        // Generate one-time keys for the invitation
+        account.generate_one_time_keys(10);
+        
         let identity_keys = account.identity_keys();
         let one_time_keys = account.one_time_keys();
 

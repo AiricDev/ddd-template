@@ -10,6 +10,7 @@ use crate::{
 use std::sync::Arc;
 use uuid::Uuid;
 
+#[derive(Clone)]
 pub struct HandleIncomingMessage {
     mesh_repo: Arc<dyn MeshRepository>,
     local_device_id: Uuid,

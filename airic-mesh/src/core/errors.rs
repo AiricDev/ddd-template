@@ -8,6 +8,8 @@ pub enum MeshError {
     Cryptography(#[from] vodozemac::olm::DecryptionError),
     #[error("Decode error from vodozemac: {0}")]
     Decode(#[from] vodozemac::DecodeError),
+    #[error("Session creation error from vodozemac: {0}")]
+    SessionCreation(#[from] vodozemac::olm::SessionCreationError),
     #[error("Device with id {0} not found")]
     DeviceNotFound(String),
     #[error("Session for devices {0} and {1} not found")]
